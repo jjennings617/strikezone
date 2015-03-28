@@ -28,11 +28,66 @@ body {
 
 </style> 
 <body>
+<div class="container">
+
+	<div class="page-header"><h3>Select your Red Sox Starter for the Home Plate Umpire</h3></div>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="dropdown">
+				<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+					Red Sox SP
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Clay Buchholz</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Joe Kelly</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Rick Porcello</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Wade Miley</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Justin Masterson</a></li>
+				</ul>
+			</div>
+			<div id="pitcherAttachPoint"></div>
+		</div>
+		<div class="col-md-6">
+			<div class="dropdown">
+				<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-expanded="true">
+					Umpire
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Separated link</a></li>
+				</ul>
+			</div>
+			<div id="umpireAttachPoint"></div>
+		</div>
+	</div>
+</div>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="js/strikezoneRender.js"></script>
 
 <script>
-	strikeZoneRender.buildStrikeZone("ClayBuchholz")
+	$('#dropdownMenu1').change(soxPitcherHandler(jQuery(this).val()));
+	$('#dropdownMenu2').change(umpHandler(jQuery(this).val()));
+
+	function soxPitcherHandler(pitcherName) {
+		strikeZoneRender.buildStrikeZone(pitcherName.replace(" ", ""), true);
+	}
+
+	function umpHandler(name) {
+		strikeZoneRender.buildStrikeZone(name.replace(" ", ""), false);
+	}
 </script>
 </body>

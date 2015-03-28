@@ -3,14 +3,15 @@
  */
 var strikeZoneRender = (function() {
 
-  function buildStrikeZone(name) {
-    var tooltip = d3.select("body")
+  function buildStrikeZone(name, isPitcher) {
+    var attachPoint = isPitcher ? "#pitcherAttachPoint" : "#umpireAttachPoint"
+    var tooltip = d3.select(attachPoint)
       .append("div")
       .attr("class", "tooltip")
       .style("position", "absolute")
       .style("z-index", "20")
       .style("visibility", "hidden")
-      .style("top", "370px")
+      .style("top", "460px")
       .style("left", "85px")
       .style("width", "300px");
 
@@ -25,7 +26,7 @@ var strikeZoneRender = (function() {
     var y = d3.scale.linear()
       .range([height, 0]);
 
-    var color = ["#346389", "#DD5C55", "#88BB4A"];
+    var color = ["#DD5C55", "#346389", "#88BB4A"];
     var colorx = d3.scale.ordinal().range(color);
 
     var xAxis = d3.svg.axis()
@@ -36,7 +37,7 @@ var strikeZoneRender = (function() {
       .scale(y)
       .orient("left");
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select(attachPoint).append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
@@ -46,14 +47,14 @@ var strikeZoneRender = (function() {
 
       data.forEach(function (d) {
         //console.log("Description=" + d.des);
-        if (d.des == "Ball" || d.des.indexOf("Strike") > -1) {
-          d.x = +d.x;
-          d.y = +d.y;
+        if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
+          d.x = +d.px;
+          d.y = +d.pz;
 
           if (d.des.indexOf("Strike") > -1) {
             d.t = "Strike"
           }
-          else if (d.type === "Ball") {
+          else if (d.des == "Ball") {
             d.t = "Ball"
           }
 
@@ -81,10 +82,14 @@ var strikeZoneRender = (function() {
       });
 
       x.domain(d3.extent(data, function (d) {
-        return d.x;
+        if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
+          return d.x;
+        }
       })).nice();
       y.domain(d3.extent(data, function (d) {
-        return d.y;
+        if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
+          return d.y;
+        }
       })).nice();
 
       console.log(x(-0.8));
@@ -106,17 +111,19 @@ var strikeZoneRender = (function() {
         .attr("class", "dot")
         .attr("r", 5)
         .attr("cx", function (d) {
-          if (d.des == "Ball" || d.des.indexOf("Strike") > -1) {
+          if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
             return x(d.x);
           }
         })
         .attr("cy", function (d) {
-          if (d.des == "Ball" || d.des.indexOf("Strike") > -1) {
+          if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
             return y(d.y);
           }
         })
         .style("fill", function (d) {
-          return colorx(d.t);
+          if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
+            return colorx(d.t);
+          }
         })
         .on("mouseover", function (d) {
           d3.select(this)
@@ -176,6 +183,7 @@ var strikeZoneRender = (function() {
         .attr("dy", ".35em")
         .style("text-anchor", "end")
         .text(function (d) {
+          console.log("text="+d);
           return d;
         });
 
