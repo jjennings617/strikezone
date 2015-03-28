@@ -135,7 +135,7 @@ var strikeZoneRender = (function() {
         .on("mouseover", function (d) {
           d3.select(this)
             .transition().duration(50).attr("r", 15),
-            tooltip.html("<h3>" + "Pitch: " + d.p + "<br>Speed: " + d.s + "<br>Description: " + d.des + "<br>X, Y: " + d.x + "," + d.y + "</h3>")
+            tooltip.html("<h3>" + "Pitch: " + d.p + "<br>Speed: " + d.s + "<br>Description: " + d.des + "</h3>")
               .style("transition-property", "opacity")
               .style("transition-duration", "0.7s")
               .style("opacity", "1")
