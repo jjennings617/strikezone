@@ -3,15 +3,15 @@
  */
 var strikeZoneRender = (function() {
 
-  function buildStrikeZone(name, isPitcher) {
-    var attachPoint = isPitcher ? "#pitcherAttachPoint" : "#umpireAttachPoint"
+  function buildStrikeZone(name, fullName, isPitcher) {
+    var attachPoint = isPitcher ? "#pitcherAttachPoint" : "#umpireAttachPoint";
     var tooltip = d3.select(attachPoint)
       .append("div")
       .attr("class", "tooltip")
       .style("position", "absolute")
       .style("z-index", "20")
       .style("visibility", "hidden")
-      .style("top", "460px")
+      .style("top", "400px")
       .style("left", "85px")
       .style("width", "300px");
 
@@ -104,6 +104,13 @@ var strikeZoneRender = (function() {
         .attr("height", (y(1.5) - y(3.5)))
         .style();
 
+      svg.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2.5))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text("Pitch Location for " + fullName);
 
       svg.selectAll(".dot")
         .data(data)
