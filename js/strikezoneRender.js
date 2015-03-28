@@ -45,39 +45,40 @@ var strikeZoneRender = (function() {
     d3.json("data/" + name + ".json", function (err, data) {
 
       data.forEach(function (d) {
-        d.x = +d.x;
-        d.y = +d.y;
+        //console.log("Description=" + d.des);
+        if (d.des == "Ball" || d.des.indexOf("Strike") > -1) {
+          d.x = +d.x;
+          d.y = +d.y;
 
-        if (d.type === "S") {
-          d.t = "Strike"
-        }
-        else if (d.type === "B") {
-          d.t = "Ball"
-        }
-        else if (d.type === "X") {
-          d.t = "In Play"
-        }
+          if (d.des.indexOf("Strike") > -1) {
+            d.t = "Strike"
+          }
+          else if (d.type === "Ball") {
+            d.t = "Ball"
+          }
 
-        if (d.pitch === "FF") {
-          d.p = "Four Seam Fastball"
+          if (d.pitch_type === "FF") {
+            d.p = "Four Seam Fastball"
+          }
+          else if (d.pitch_type === "FA") {
+            d.p = "Fastball"
+          }
+          else if (d.pitch_type === "FT") {
+            d.p = "Two Seam Fastball"
+          }
+          else if (d.pitch_type === "CU") {
+            d.p = "Curveball"
+          }
+          else if (d.pitch_type === "SL") {
+            d.p = "Slider"
+          }
+          else if (d.pitch_type === "CH") {
+            d.p = "Changeup"
+          }
+          d.s = d.start_speed;
         }
-        else if (d.pitch === "FT") {
-          d.p = "Two Seam Fastball"
-        }
-        else if (d.pitch === "CU") {
-          d.p = "Curveball"
-        }
-        else if (d.pitch === "SL") {
-          d.p = "Slider"
-        }
-        else if (d.pitch === "CH") {
-          d.p = "Changeup"
-        }
-        d.s = d.start_speed;
-        d.des = d.des;
-
         //console.log(d.x, d.y);
-      })
+      });
 
       x.domain(d3.extent(data, function (d) {
         return d.x;
@@ -105,10 +106,14 @@ var strikeZoneRender = (function() {
         .attr("class", "dot")
         .attr("r", 5)
         .attr("cx", function (d) {
-          return x(d.x);
+          if (d.des == "Ball" || d.des.indexOf("Strike") > -1) {
+            return x(d.x);
+          }
         })
         .attr("cy", function (d) {
-          return y(d.y);
+          if (d.des == "Ball" || d.des.indexOf("Strike") > -1) {
+            return y(d.y);
+          }
         })
         .style("fill", function (d) {
           return colorx(d.t);
@@ -116,7 +121,7 @@ var strikeZoneRender = (function() {
         .on("mouseover", function (d) {
           d3.select(this)
             .transition().duration(50).attr("r", 15),
-            tooltip.html("<h3>" + "Pitch: " + d.p + "<br>Speed: " + d.s + "<br>Description: " + d.des + "</h3>")
+            tooltip.html("<h3>" + "Pitch: " + d.p + "<br>Speed: " + d.s + "<br>Description: " + d.des + "<br>X, Y: " + d.x + "," + d.y + "</h3>")
               .style("transition-property", "opacity")
               .style("transition-duration", "0.7s")
               .style("opacity", "1")
