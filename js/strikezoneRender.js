@@ -3,14 +3,15 @@
  */
 var strikeZoneRender = (function() {
 
-  function buildStrikeZone(name) {
-    var tooltip = d3.select("body")
+  function buildStrikeZone(name, fullName, isPitcher) {
+    var attachPoint = isPitcher ? "#pitcherAttachPoint" : "#umpireAttachPoint";
+    var tooltip = d3.select(attachPoint)
       .append("div")
       .attr("class", "tooltip")
       .style("position", "absolute")
       .style("z-index", "20")
       .style("visibility", "hidden")
-      .style("top", "370px")
+      .style("top", "400px")
       .style("left", "85px")
       .style("width", "300px");
 
@@ -25,7 +26,7 @@ var strikeZoneRender = (function() {
     var y = d3.scale.linear()
       .range([height, 0]);
 
-    var color = ["#346389", "#DD5C55", "#88BB4A"];
+    var color = ["#DD5C55", "#346389", "#88BB4A"];
     var colorx = d3.scale.ordinal().range(color);
 
     var xAxis = d3.svg.axis()
@@ -36,7 +37,7 @@ var strikeZoneRender = (function() {
       .scale(y)
       .orient("left");
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select(attachPoint).append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
@@ -45,45 +46,50 @@ var strikeZoneRender = (function() {
     d3.json("data/" + name + ".json", function (err, data) {
 
       data.forEach(function (d) {
-        d.x = +d.x;
-        d.y = +d.y;
+        //console.log("Description=" + d.des);
+        if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
+          d.x = +d.px;
+          d.y = +d.pz;
 
-        if (d.type === "S") {
-          d.t = "Strike"
-        }
-        else if (d.type === "B") {
-          d.t = "Ball"
-        }
-        else if (d.type === "X") {
-          d.t = "In Play"
-        }
+          if (d.des.indexOf("Strike") > -1) {
+            d.t = "Strike"
+          }
+          else if (d.des == "Ball") {
+            d.t = "Ball"
+          }
 
-        if (d.pitch === "FF") {
-          d.p = "Four Seam Fastball"
+          if (d.pitch_type === "FF") {
+            d.p = "Four Seam Fastball"
+          }
+          else if (d.pitch_type === "FA") {
+            d.p = "Fastball"
+          }
+          else if (d.pitch_type === "FT") {
+            d.p = "Two Seam Fastball"
+          }
+          else if (d.pitch_type === "CU") {
+            d.p = "Curveball"
+          }
+          else if (d.pitch_type === "SL") {
+            d.p = "Slider"
+          }
+          else if (d.pitch_type === "CH") {
+            d.p = "Changeup"
+          }
+          d.s = d.start_speed;
         }
-        else if (d.pitch === "FT") {
-          d.p = "Two Seam Fastball"
-        }
-        else if (d.pitch === "CU") {
-          d.p = "Curveball"
-        }
-        else if (d.pitch === "SL") {
-          d.p = "Slider"
-        }
-        else if (d.pitch === "CH") {
-          d.p = "Changeup"
-        }
-        d.s = d.start_speed;
-        d.des = d.des;
-
         //console.log(d.x, d.y);
-      })
+      });
 
       x.domain(d3.extent(data, function (d) {
-        return d.x;
+        if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
+          return d.x;
+        }
       })).nice();
       y.domain(d3.extent(data, function (d) {
-        return d.y;
+        if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
+          return d.y;
+        }
       })).nice();
 
       console.log(x(-0.8));
@@ -98,6 +104,13 @@ var strikeZoneRender = (function() {
         .attr("height", (y(1.5) - y(3.5)))
         .style();
 
+      svg.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2.5))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text("Pitch Location for " + fullName);
 
       svg.selectAll(".dot")
         .data(data)
@@ -105,13 +118,19 @@ var strikeZoneRender = (function() {
         .attr("class", "dot")
         .attr("r", 5)
         .attr("cx", function (d) {
-          return x(d.x);
+          if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
+            return x(d.x);
+          }
         })
         .attr("cy", function (d) {
-          return y(d.y);
+          if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
+            return y(d.y);
+          }
         })
         .style("fill", function (d) {
-          return colorx(d.t);
+          if (d.px && (d.des == "Ball" || d.des.indexOf("Strike") > -1)) {
+            return colorx(d.t);
+          }
         })
         .on("mouseover", function (d) {
           d3.select(this)
@@ -171,6 +190,7 @@ var strikeZoneRender = (function() {
         .attr("dy", ".35em")
         .style("text-anchor", "end")
         .text(function (d) {
+          console.log("text="+d);
           return d;
         });
 
